@@ -1,0 +1,6 @@
+{
+  "name": "ReadTracker",
+  "description": "Трекер прочитанных слов, томов и глав для новелл, книг и визуальных новелл",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
