@@ -68,7 +68,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
-import com.example.ui.components.rememberBouncyOverscrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -392,10 +391,8 @@ fun AddEditBookScreen(
         ) {
             if (isEditMode) {
                 // Edit mode: single scroll view
-                val bouncyState = rememberBouncyOverscrollState()
                 LazyColumn(
-                    state = bouncyState.listState,
-                    modifier = bouncyState.modifier
+                    modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
@@ -899,11 +896,9 @@ private fun Step0Title(
     onOpenCoverPicker: () -> Unit
 ) {
     val colors = LocalReadTrackerColors.current
-    val bouncyState = rememberBouncyOverscrollState()
 
     LazyColumn(
-        state = bouncyState.listState,
-        modifier = bouncyState.modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
@@ -1044,11 +1039,9 @@ private fun Step1StatusFormat(
     onRequestFormatChange: (String) -> Unit
 ) {
     val colors = LocalReadTrackerColors.current
-    val bouncyState = rememberBouncyOverscrollState()
 
     LazyColumn(
-        state = bouncyState.listState,
-        modifier = bouncyState.modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
@@ -1345,10 +1338,8 @@ private fun Step2Data(
     onTotalVolumesInSeriesChange: (String) -> Unit,
     volumeEntriesList: MutableList<VolumeEntry>
 ) {
-    val bouncyState = rememberBouncyOverscrollState()
     LazyColumn(
-        state = bouncyState.listState,
-        modifier = bouncyState.modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {

@@ -81,7 +81,6 @@ import com.example.ui.components.CardGroupDivider
 import com.example.ui.components.ColorPickerBottomSheet
 import com.example.ui.components.CustomSwitch
 import com.example.ui.components.SectionLabel
-import com.example.ui.components.rememberBouncyOverscrollState
 import com.example.ui.theme.LocalReadTrackerColors
 import com.example.ui.theme.PlusJakartaSansFamily
 import com.example.ui.theme.RadiusLarge
@@ -225,11 +224,8 @@ fun SettingsScreen(
             )
         }
 
-        val bouncyState = rememberBouncyOverscrollState()
-
         LazyColumn(
-            state = bouncyState.listState,
-            modifier = bouncyState.modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
@@ -375,6 +371,13 @@ fun SettingsScreen(
                         subtitle = if (settings.alignFilters) "Вкладки «Все», «Читаю»… начинаются ровно под заголовком" else "Вкладки у самого края экрана",
                         checked = settings.alignFilters,
                         onCheckedChange = { onUpdateSettings(settings.copy(alignFilters = it)) }
+                    )
+                    CardGroupDivider()
+                    SwitchRow(
+                        title = "Стиль фильтров «Линия»",
+                        subtitle = if (settings.filterUnderlineStyle) "Без капсулы, под словом подчёркивание" else "Капсулы вокруг слов (по умолчанию)",
+                        checked = settings.filterUnderlineStyle,
+                        onCheckedChange = { onUpdateSettings(settings.copy(filterUnderlineStyle = it)) }
                     )
                     CardGroupDivider()
                     SwitchRow(

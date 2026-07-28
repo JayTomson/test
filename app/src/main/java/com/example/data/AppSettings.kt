@@ -26,6 +26,7 @@ data class AppSettings(
     val showStatusLabel: Boolean = true,
     val enableSearch: Boolean = false,
     val alignFilters: Boolean = false,
+    val filterUnderlineStyle: Boolean = false,
     val fabGlow: Boolean = true,
     val enableVN: Boolean = false,
     val enableTotalWords: Boolean = false,

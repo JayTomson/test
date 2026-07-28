@@ -58,7 +58,9 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
-import com.example.ui.components.rememberBouncyOverscrollState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -181,28 +183,25 @@ fun LibraryScreen(
         val tabs = listOf("Все", "Читаю", "В планах", "Завершено", "На паузе", "Брошено")
         val currentTabIndex = appState.selectedTab.coerceIn(0, 5)
 
-        ScrollableTabRow(
-            selectedTabIndex = currentTabIndex,
-            edgePadding = if (settings.alignFilters) 8.dp else 16.dp,
-            containerColor = colors.screenBg,
-            indicator = { tabPositions ->
-                if (currentTabIndex in tabPositions.indices) {
-                    SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[currentTabIndex]),
-                        height = 3.dp,
-                        color = colors.accent
-                    )
-                }
-            },
-            divider = {},
-            modifier = Modifier.height(42.dp)
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(42.dp),
+            contentPadding = PaddingValues(horizontal = if (settings.alignFilters) 8.dp else 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            tabs.forEachIndexed { index, title ->
+            itemsIndexed(tabs) { index, title ->
                 val isSelected = (currentTabIndex == index)
-                Tab(
-                    selected = isSelected,
-                    onClick = { onTabSelected(index) },
-                    text = {
+                if (settings.filterUnderlineStyle) {
+                    Column(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onTabSelected(index) }
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
                             text = title,
                             style = TextStyle(
@@ -214,9 +213,47 @@ fun LibraryScreen(
                             maxLines = 1,
                             softWrap = false
                         )
-                    },
-                    modifier = Modifier.padding(horizontal = 4.dp)
-                )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(3.dp)
+                                .clip(CircleShape)
+                                .background(if (isSelected) colors.accent else Color.Transparent)
+                        )
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(
+                                if (isSelected) colors.accent.copy(alpha = 0.20f)
+                                else colors.cardBg
+                            )
+                            .border(
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = if (isSelected) colors.accent else colors.dividerColor,
+                                shape = RoundedCornerShape(20.dp)
+                            )
+                            .clickable {
+                                onTabSelected(index)
+                            }
+                            .padding(horizontal = 14.dp, vertical = 7.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            style = TextStyle(
+                                fontFamily = PlusJakartaSansFamily,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                fontSize = 13.sp,
+                                color = if (isSelected) colors.accent else colors.textSecondary
+                            ),
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    }
+                }
             }
         }
 
@@ -399,11 +436,8 @@ fun LibraryScreen(
                 }
             }
         } else {
-            val bouncyState = rememberBouncyOverscrollState()
-
             LazyColumn(
-                state = bouncyState.listState,
-                modifier = bouncyState.modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 item { Spacer(modifier = Modifier.height(4.dp)) }
                 items(filteredBooks, key = { it.id }) { book ->

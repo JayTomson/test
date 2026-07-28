@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.sp
 import com.example.data.BookStatus
 import com.example.data.fmtNum
 import com.example.ui.AppState
-import com.example.ui.components.rememberBouncyOverscrollState
 import com.example.ui.components.CardGroup
 import com.example.ui.components.CardGroupDivider
 import com.example.ui.components.SectionLabel
@@ -101,11 +100,8 @@ fun AnalyticsScreen(
             )
         }
 
-        val bouncyState = rememberBouncyOverscrollState()
-
         LazyColumn(
-            state = bouncyState.listState,
-            modifier = bouncyState.modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
