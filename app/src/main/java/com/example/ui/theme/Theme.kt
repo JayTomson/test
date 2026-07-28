@@ -9,6 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +39,12 @@ data class ReadTrackerThemeColors(
     val tagHybrid: Color,
     val tagOngoing: Color
 ) {
+    val accentOnColor: Color
+        get() = if (accent.luminance() > 0.5f) Color.Black else Color.White
+
+    val textSecondary: Color
+        get() = textFg.copy(alpha = 0.6f)
+
     fun getColorForStatus(status: BookStatus): Color {
         return when (status) {
             BookStatus.PLANNED -> cPlanned

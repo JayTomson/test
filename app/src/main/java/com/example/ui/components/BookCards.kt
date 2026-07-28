@@ -110,10 +110,11 @@ private fun BookCardCompact(
             Spacer(modifier = Modifier.width(10.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                // Line 1: Title + Rating + Badges
+                // Line 1: Title + Rating
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = book.title,
@@ -125,19 +126,23 @@ private fun BookCardCompact(
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f)
                     )
 
                     if (settings.enableRating && book.rating != null) {
+                        Spacer(modifier = Modifier.width(6.dp))
                         RatingBadge(text = book.getRatingDisplay(settings.ratingScale))
                     }
-
-                    CardBadges(book, settings)
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Line 2: Status label + Metrics
+                // Line 2: Badges
+                CardBadges(book, settings)
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Line 3: Status label + Metrics
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -169,7 +174,7 @@ private fun BookCardCompact(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = null,
-                tint = Color.Gray,
+                tint = colors.textSecondary,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -214,7 +219,8 @@ private fun BookCardWithCover(
             Column(modifier = Modifier.weight(1f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
                         text = book.title,
@@ -226,10 +232,11 @@ private fun BookCardWithCover(
                         ),
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f)
                     )
 
                     if (settings.enableRating && book.rating != null) {
+                        Spacer(modifier = Modifier.width(6.dp))
                         RatingBadge(text = book.getRatingDisplay(settings.ratingScale))
                     }
                 }
@@ -265,7 +272,7 @@ private fun BookCardWithCover(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = null,
-                tint = Color.Gray,
+                tint = colors.textSecondary,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -344,7 +351,7 @@ private fun BookCardMinimal(
                                 color = statusColor
                             )
                         )
-                        Text(text = "·", color = Color.Gray.copy(alpha = 0.6f), fontSize = 11.sp)
+                        Text(text = "·", color = colors.textSecondary.copy(alpha = 0.6f), fontSize = 11.sp)
                     }
 
                     val metaList = mutableListOf<String>()
@@ -367,7 +374,7 @@ private fun BookCardMinimal(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontSize = 10.sp,
-                            color = Color.Gray
+                            color = colors.textSecondary
                         ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -392,7 +399,7 @@ private fun BookCardMinimal(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = null,
-                tint = Color.Gray,
+                tint = colors.textSecondary,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -481,7 +488,7 @@ private fun BookCardExpanded(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                     contentDescription = null,
-                    tint = Color.Gray,
+                    tint = colors.textSecondary,
                     modifier = Modifier.size(17.dp)
                 )
             }
@@ -693,11 +700,12 @@ private fun MetricItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String
 ) {
+    val colors = LocalReadTrackerColors.current
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color.Gray,
+            tint = colors.textSecondary,
             modifier = Modifier.size(11.dp)
         )
         Spacer(modifier = Modifier.width(3.dp))
@@ -706,7 +714,7 @@ private fun MetricItem(
             style = TextStyle(
                 fontFamily = PlusJakartaSansFamily,
                 fontSize = 11.sp,
-                color = Color.Gray
+                color = colors.textSecondary
             )
         )
     }
@@ -776,7 +784,7 @@ fun BookCoverImage(
                     Icon(
                         imageVector = Icons.Default.BrokenImage,
                         contentDescription = null,
-                        tint = Color.Gray,
+                        tint = colors.textSecondary,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -785,7 +793,7 @@ fun BookCoverImage(
             Icon(
                 imageVector = Icons.Default.Image,
                 contentDescription = null,
-                tint = Color.Gray,
+                tint = colors.textSecondary,
                 modifier = Modifier.size(22.dp)
             )
         }

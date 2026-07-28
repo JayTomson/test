@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -67,6 +68,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
+import com.example.ui.components.rememberBouncyOverscrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -324,6 +326,7 @@ fun AddEditBookScreen(
         modifier = modifier
             .fillMaxSize()
             .background(colors.screenBg)
+            .imePadding()
     ) {
         // AppBar
         Row(
@@ -389,8 +392,10 @@ fun AddEditBookScreen(
         ) {
             if (isEditMode) {
                 // Edit mode: single scroll view
+                val bouncyState = rememberBouncyOverscrollState()
                 LazyColumn(
-                    modifier = Modifier
+                    state = bouncyState.listState,
+                    modifier = bouncyState.modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
@@ -447,7 +452,7 @@ fun AddEditBookScreen(
                                 OutlinedTextField(
                                     value = title,
                                     onValueChange = { title = it },
-                                    placeholder = { Text("Введите название...", color = Color.Gray) },
+                                    placeholder = { Text("Введите название...", color = colors.textSecondary) },
                                     singleLine = true,
                                     shape = RoundedCornerShape(RadiusMedium),
                                     colors = OutlinedTextFieldDefaults.colors(
@@ -494,7 +499,7 @@ fun AddEditBookScreen(
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text("Учитывать тома", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = colors.textFg))
-                                        Text("Отключите для изданий без томов", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = Color.Gray))
+                                        Text("Отключите для изданий без томов", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = colors.textSecondary))
                                     }
                                     CustomSwitch(
                                         checked = countVolumes,
@@ -662,14 +667,14 @@ fun AddEditBookScreen(
                                         fontFamily = PlusJakartaSansFamily,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 16.sp,
-                                        color = Color.White
+                                        color = colors.accentOnColor
                                     )
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Icon(
                                     imageVector = if (currentStep < 2) Icons.AutoMirrored.Filled.ArrowForward else Icons.Default.Check,
                                     contentDescription = null,
-                                    tint = Color.White,
+                                    tint = colors.accentOnColor,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -717,7 +722,7 @@ fun AddEditBookScreen(
                 OutlinedTextField(
                     value = tempUrl,
                     onValueChange = { tempUrl = it },
-                    placeholder = { Text("Вставьте ссылку...", color = Color.Gray) },
+                    placeholder = { Text("Вставьте ссылку...", color = colors.textSecondary) },
                     singleLine = true,
                     shape = RoundedCornerShape(RadiusMedium),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -756,7 +761,7 @@ fun AddEditBookScreen(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray
+                            color = colors.textSecondary
                         )
                     )
                 }
@@ -787,7 +792,7 @@ fun AddEditBookScreen(
                     style = TextStyle(
                         fontFamily = PlusJakartaSansFamily,
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             },
@@ -815,7 +820,7 @@ fun AddEditBookScreen(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray
+                            color = colors.textSecondary
                         )
                     )
                 }
@@ -844,7 +849,7 @@ private fun StepIndicator(
             for (i in 0..2) {
                 val barColor = when {
                     i <= currentStep -> colors.accent
-                    else -> Color.Gray.copy(alpha = 0.25f)
+                    else -> colors.textSecondary.copy(alpha = 0.25f)
                 }
                 Box(
                     modifier = Modifier
@@ -866,8 +871,8 @@ private fun StepIndicator(
             stepLabels.forEachIndexed { i, label ->
                 val textColor = when {
                     i == currentStep -> colors.accent
-                    i < currentStep -> Color.Gray
-                    else -> Color.Gray.copy(alpha = 0.50f)
+                    i < currentStep -> colors.textSecondary
+                    else -> colors.textSecondary.copy(alpha = 0.50f)
                 }
                 Text(
                     text = label,
@@ -894,19 +899,21 @@ private fun Step0Title(
     onOpenCoverPicker: () -> Unit
 ) {
     val colors = LocalReadTrackerColors.current
+    val bouncyState = rememberBouncyOverscrollState()
 
     LazyColumn(
-        modifier = Modifier
+        state = bouncyState.listState,
+        modifier = bouncyState.modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Cover area 200x138dp
+            // Vertical portrait cover area 140x195dp
             Box(
                 modifier = Modifier
-                    .size(width = 200.dp, height = 138.dp)
+                    .size(width = 140.dp, height = 195.dp)
                     .clip(RoundedCornerShape(RadiusLarge))
                     .background(colors.cardBg)
                     .clickable { onOpenCoverPicker() }
@@ -984,7 +991,7 @@ private fun Step0Title(
             OutlinedTextField(
                 value = title,
                 onValueChange = onTitleChange,
-                placeholder = { Text("Введите название...", color = Color.Gray) },
+                placeholder = { Text("Введите название...", color = colors.textSecondary) },
                 singleLine = true,
                 shape = RoundedCornerShape(RadiusMedium),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -1004,7 +1011,7 @@ private fun Step0Title(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = null,
-                    tint = Color.Gray,
+                    tint = colors.textSecondary,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
@@ -1013,7 +1020,7 @@ private fun Step0Title(
                     style = TextStyle(
                         fontFamily = PlusJakartaSansFamily,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             }
@@ -1037,9 +1044,11 @@ private fun Step1StatusFormat(
     onRequestFormatChange: (String) -> Unit
 ) {
     val colors = LocalReadTrackerColors.current
+    val bouncyState = rememberBouncyOverscrollState()
 
     LazyColumn(
-        modifier = Modifier
+        state = bouncyState.listState,
+        modifier = bouncyState.modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
@@ -1075,7 +1084,7 @@ private fun Step1StatusFormat(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Учитывать тома", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = colors.textFg))
-                            Text("Отключите для изданий без томов", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = Color.Gray))
+                            Text("Отключите для изданий без томов", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = colors.textSecondary))
                         }
                         CustomSwitch(
                             checked = countVolumes,
@@ -1284,13 +1293,13 @@ private fun FormatRadioRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (selected) colors.accent else Color.Gray,
+            tint = if (selected) colors.accent else colors.textSecondary,
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(title, style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = colors.textFg))
-            Text(subtitle, style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = Color.Gray))
+            Text(subtitle, style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = colors.textSecondary))
         }
     }
 }
@@ -1336,8 +1345,10 @@ private fun Step2Data(
     onTotalVolumesInSeriesChange: (String) -> Unit,
     volumeEntriesList: MutableList<VolumeEntry>
 ) {
+    val bouncyState = rememberBouncyOverscrollState()
     LazyColumn(
-        modifier = Modifier
+        state = bouncyState.listState,
+        modifier = bouncyState.modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
@@ -1438,7 +1449,7 @@ private fun DataFieldsSection(
             value = currentBookmark,
             onValueChange = onBookmarkChange,
             leadingIcon = { Icon(Icons.Default.Bookmark, null, tint = colors.accent, modifier = Modifier.size(18.dp)) },
-            placeholder = { Text("Впишите главу/том, например: 1.4 глава, 1х3.3", color = Color.Gray, fontSize = 13.sp) },
+            placeholder = { Text("Впишите главу/том, например: 1.4 глава, 1х3.3", color = colors.textSecondary, fontSize = 13.sp) },
             singleLine = true,
             shape = RoundedCornerShape(RadiusMedium),
             colors = OutlinedTextFieldDefaults.colors(
@@ -1462,7 +1473,7 @@ private fun DataFieldsSection(
                 value = startChapterStr,
                 onValueChange = { onStartChapterChange(it.filter { c -> c.isDigit() }) },
                 leadingIcon = { Icon(Icons.Default.PlayArrow, null, tint = colors.accent, modifier = Modifier.size(18.dp)) },
-                placeholder = { Text("Начальная глава (с какой начали)", color = Color.Gray, fontSize = 13.sp) },
+                placeholder = { Text("Начальная глава (с какой начали)", color = colors.textSecondary, fontSize = 13.sp) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(RadiusMedium),
@@ -1481,7 +1492,7 @@ private fun DataFieldsSection(
                 value = startVolumeStr,
                 onValueChange = { onStartVolumeChange(it.filter { c -> c.isDigit() }) },
                 leadingIcon = { Icon(Icons.Default.PlayArrow, null, tint = colors.accent, modifier = Modifier.size(18.dp)) },
-                placeholder = { Text("Начальный том (с какого начали)", color = Color.Gray, fontSize = 13.sp) },
+                placeholder = { Text("Начальный том (с какого начали)", color = colors.textSecondary, fontSize = 13.sp) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(RadiusMedium),
@@ -1524,7 +1535,7 @@ private fun DataFieldsSection(
                         Icon(
                             imageVector = if (isActive) Icons.Default.Star else Icons.Default.StarOutline,
                             contentDescription = null,
-                            tint = if (isActive) colors.accent else Color.Gray,
+                            tint = if (isActive) colors.accent else colors.textSecondary,
                             modifier = Modifier
                                 .size(starSize)
                                 .clickable {
@@ -1580,7 +1591,7 @@ private fun DataFieldsSection(
                 value = endingsReadStr,
                 onValueChange = { onEndingsReadChange(it.filter { c -> c.isDigit() }) },
                 label = { Text("Пройдено концовок", fontSize = 12.sp) },
-                leadingIcon = { Icon(Icons.Default.VideogameAsset, null, tint = Color.Gray, modifier = Modifier.size(18.dp)) },
+                leadingIcon = { Icon(Icons.Default.VideogameAsset, null, tint = colors.textSecondary, modifier = Modifier.size(18.dp)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(RadiusMedium),
@@ -1599,8 +1610,8 @@ private fun DataFieldsSection(
                 value = endingsTotalStr,
                 onValueChange = { onEndingsTotalChange(it.filter { c -> c.isDigit() }) },
                 label = { Text("Всего концовок", fontSize = 12.sp) },
-                placeholder = { Text("Необяз.", color = Color.Gray, fontSize = 12.sp) },
-                leadingIcon = { Icon(Icons.Default.BookmarkBorder, null, tint = Color.Gray, modifier = Modifier.size(18.dp)) },
+                placeholder = { Text("Необяз.", color = colors.textSecondary, fontSize = 12.sp) },
+                leadingIcon = { Icon(Icons.Default.BookmarkBorder, null, tint = colors.textSecondary, modifier = Modifier.size(18.dp)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(RadiusMedium),
@@ -1655,7 +1666,7 @@ private fun DataFieldsSection(
                     if (isHybridFormat) onHybridTotalWebChaptersChange(cleaned) else onTotalWebChaptersChange(cleaned)
                 },
                 label = { Text("Всего глав", fontSize = 12.sp) },
-                placeholder = { Text("Необяз.", color = Color.Gray, fontSize = 12.sp) },
+                placeholder = { Text("Необяз.", color = colors.textSecondary, fontSize = 12.sp) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(RadiusMedium),
@@ -1687,7 +1698,7 @@ private fun DataFieldsSection(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Расчёт по томам", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = colors.textFg))
-                        Text(if (useDetailedVolumes) "Записывать слова каждого тома" else "Ввести суммарно по книге", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = Color.Gray))
+                        Text(if (useDetailedVolumes) "Записывать слова каждого тома" else "Ввести суммарно по книге", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = colors.textSecondary))
                     }
                     CustomSwitch(
                         checked = useDetailedVolumes,
@@ -1827,7 +1838,7 @@ private fun DataFieldsSection(
                     value = wordsStr,
                     onValueChange = { onWordsChange(it.filter { c -> c.isDigit() }) },
                     label = { Text("СЛОВ", fontSize = 11.sp) },
-                    leadingIcon = { Icon(Icons.Default.TextFields, null, tint = Color.Gray, modifier = Modifier.size(18.dp)) },
+                    leadingIcon = { Icon(Icons.Default.TextFields, null, tint = colors.textSecondary, modifier = Modifier.size(18.dp)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = RoundedCornerShape(RadiusMedium),
@@ -1847,7 +1858,7 @@ private fun DataFieldsSection(
                         value = volumesStr,
                         onValueChange = { onVolumesChange(it.filter { c -> c.isDigit() || c == '.' }) },
                         label = { Text("ТОМОВ", fontSize = 11.sp) },
-                        leadingIcon = { Icon(Icons.Default.Layers, null, tint = Color.Gray, modifier = Modifier.size(18.dp)) },
+                        leadingIcon = { Icon(Icons.Default.Layers, null, tint = colors.textSecondary, modifier = Modifier.size(18.dp)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         shape = RoundedCornerShape(RadiusMedium),
@@ -1873,8 +1884,8 @@ private fun DataFieldsSection(
         OutlinedTextField(
             value = totalWordsInBookStr,
             onValueChange = { onTotalWordsInBookChange(it.filter { c -> c.isDigit() }) },
-            leadingIcon = { Icon(Icons.Default.TextSnippet, null, tint = Color.Gray, modifier = Modifier.size(18.dp)) },
-            placeholder = { Text("Например: 1 200 000", color = Color.Gray, fontSize = 13.sp) },
+            leadingIcon = { Icon(Icons.Default.TextSnippet, null, tint = colors.textSecondary, modifier = Modifier.size(18.dp)) },
+            placeholder = { Text("Например: 1 200 000", color = colors.textSecondary, fontSize = 13.sp) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = RoundedCornerShape(RadiusMedium),
@@ -1903,7 +1914,7 @@ private fun DataFieldsSection(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Онгоинг", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = colors.textFg))
-                    Text(if (isOngoing) "Отображается как 5/?" else "Кол-во томов известно", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = Color.Gray))
+                    Text(if (isOngoing) "Отображается как 5/?" else "Кол-во томов известно", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = colors.textSecondary))
                 }
                 CustomSwitch(
                     checked = isOngoing,
@@ -1917,7 +1928,7 @@ private fun DataFieldsSection(
             OutlinedTextField(
                 value = totalVolumesInSeriesStr,
                 onValueChange = { onTotalVolumesInSeriesChange(it.filter { c -> c.isDigit() }) },
-                placeholder = { Text("Необязательно — напр. 25", color = Color.Gray, fontSize = 13.sp) },
+                placeholder = { Text("Необязательно — напр. 25", color = colors.textSecondary, fontSize = 13.sp) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = RoundedCornerShape(RadiusMedium),
@@ -1962,7 +1973,7 @@ private fun CoverPickerBottomSheet(
                     .width(36.dp)
                     .height(4.dp)
                     .clip(CircleShape)
-                    .background(Color.Gray.copy(alpha = 0.3f))
+                    .background(colors.textSecondary.copy(alpha = 0.3f))
                     .align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(16.dp))

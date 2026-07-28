@@ -81,6 +81,7 @@ import com.example.ui.components.CardGroupDivider
 import com.example.ui.components.ColorPickerBottomSheet
 import com.example.ui.components.CustomSwitch
 import com.example.ui.components.SectionLabel
+import com.example.ui.components.rememberBouncyOverscrollState
 import com.example.ui.theme.LocalReadTrackerColors
 import com.example.ui.theme.PlusJakartaSansFamily
 import com.example.ui.theme.RadiusLarge
@@ -224,8 +225,11 @@ fun SettingsScreen(
             )
         }
 
+        val bouncyState = rememberBouncyOverscrollState()
+
         LazyColumn(
-            modifier = Modifier
+            state = bouncyState.listState,
+            modifier = bouncyState.modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
@@ -287,7 +291,7 @@ fun SettingsScreen(
                                 style = TextStyle(
                                     fontFamily = PlusJakartaSansFamily,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = colors.textSecondary
                                 )
                             )
                         }
@@ -581,7 +585,7 @@ fun SettingsScreen(
                     style = TextStyle(
                         fontFamily = PlusJakartaSansFamily,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -596,7 +600,7 @@ fun SettingsScreen(
                             style = TextStyle(
                                 fontFamily = PlusJakartaSansFamily,
                                 fontSize = 13.sp,
-                                color = Color.Gray
+                                color = colors.textSecondary
                             ),
                             modifier = Modifier.padding(16.dp)
                         )
@@ -640,7 +644,7 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = Icons.Default.DragHandle,
                                     contentDescription = null,
-                                    tint = Color.Gray,
+                                    tint = colors.textSecondary,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -723,7 +727,7 @@ fun SettingsScreen(
                                 style = TextStyle(
                                     fontFamily = PlusJakartaSansFamily,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = colors.textSecondary
                                 )
                             )
                         }
@@ -927,7 +931,7 @@ fun SettingsScreen(
                     style = TextStyle(
                         fontFamily = PlusJakartaSansFamily,
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             },
@@ -975,7 +979,7 @@ fun SettingsScreen(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray
+                            color = colors.textSecondary
                         )
                     )
                 }
@@ -1003,7 +1007,7 @@ private fun ThemeOptionRow(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (selected) colors.accent else Color.Gray,
+            tint = if (selected) colors.accent else colors.textSecondary,
             modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(12.dp))
@@ -1020,7 +1024,7 @@ private fun ThemeOptionRow(
         Icon(
             imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
             contentDescription = null,
-            tint = if (selected) colors.accent else Color.Gray,
+            tint = if (selected) colors.accent else colors.textSecondary,
             modifier = Modifier.size(20.dp)
         )
     }
@@ -1057,7 +1061,7 @@ private fun CardStyleOptionRow(
                 .padding(4.dp),
             contentAlignment = Alignment.Center
         ) {
-            val lineColor = if (selected) colors.accent else Color.Gray
+            val lineColor = if (selected) colors.accent else colors.textSecondary
             val bgLine = if (colors.screenBg == Color.Black || colors.cardBg == Color(0xFF1C1C1E) || colors.cardBg == Color(0xFF141414)) Color.White.copy(alpha = 0.24f) else Color.Black.copy(alpha = 0.26f)
 
             when (styleCode) {
@@ -1108,13 +1112,13 @@ private fun CardStyleOptionRow(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(title, style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = colors.textFg))
-            Text(subtitle, style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = Color.Gray))
+            Text(subtitle, style = TextStyle(fontFamily = PlusJakartaSansFamily, fontSize = 12.sp, color = colors.textSecondary))
         }
 
         Icon(
             imageVector = if (selected) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
             contentDescription = null,
-            tint = if (selected) colors.accent else Color.Gray,
+            tint = if (selected) colors.accent else colors.textSecondary,
             modifier = Modifier.size(20.dp)
         )
     }
@@ -1151,7 +1155,7 @@ private fun SwitchRow(
                 style = TextStyle(
                     fontFamily = PlusJakartaSansFamily,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colors.textSecondary
                 )
             )
         }
@@ -1276,7 +1280,7 @@ private fun ColorTileRow(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
             contentDescription = null,
-            tint = Color.Gray,
+            tint = colors.textSecondary,
             modifier = Modifier.size(18.dp)
         )
     }
@@ -1331,7 +1335,7 @@ private fun DataActionTile(
                 style = TextStyle(
                     fontFamily = PlusJakartaSansFamily,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colors.textSecondary
                 )
             )
         }
@@ -1339,7 +1343,7 @@ private fun DataActionTile(
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
             contentDescription = null,
-            tint = Color.Gray,
+            tint = colors.textSecondary,
             modifier = Modifier.size(20.dp)
         )
     }
@@ -1386,7 +1390,7 @@ private fun HelpBlock(
                     style = TextStyle(
                         fontFamily = PlusJakartaSansFamily,
                         fontSize = 13.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             }

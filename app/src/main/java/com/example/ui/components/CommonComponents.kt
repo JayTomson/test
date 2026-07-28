@@ -1,7 +1,17 @@
 package com.example.ui.components
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import kotlinx.coroutines.CoroutineScope
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -77,6 +88,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    val colors = LocalReadTrackerColors.current
     Text(
         text = text.uppercase(),
         style = TextStyle(
@@ -84,7 +96,7 @@ fun SectionLabel(text: String, modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold,
             fontSize = 11.sp,
             letterSpacing = 0.6.sp,
-            color = Color.Gray
+            color = colors.textSecondary
         ),
         modifier = modifier.padding(bottom = 8.dp)
     )
@@ -212,13 +224,14 @@ fun ColorPickerBottomSheet(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 24.dp)
+                .imePadding()
         ) {
             Box(
                 modifier = Modifier
                     .width(36.dp)
                     .height(4.dp)
                     .clip(CircleShape)
-                    .background(Color.Gray.copy(alpha = 0.3f))
+                    .background(colors.textSecondary.copy(alpha = 0.3f))
                     .align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -294,7 +307,7 @@ fun ColorPickerBottomSheet(
                         hexError = null
                     },
                     prefix = { Text("#", style = TextStyle(fontFamily = PlusJakartaSansFamily, fontWeight = FontWeight.Bold, color = colors.textFg)) },
-                    placeholder = { Text("FF9F0A", color = Color.Gray) },
+                    placeholder = { Text("FF9F0A", color = colors.textSecondary) },
                     singleLine = true,
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(RadiusMedium),
@@ -329,7 +342,7 @@ fun ColorPickerBottomSheet(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = colors.accentOnColor
                         )
                     )
                 }
@@ -377,4 +390,104 @@ fun ColorSwatch(
             )
         }
     }
+}
+
+@Composable
+fun rememberBouncyOverscrollState(
+    listState: LazyListState = rememberLazyListState()
+): BouncyOverscrollState {
+    val coroutineScope = rememberCoroutineScope()
+    val animOffset = remember { Animatable(0f) }
+
+    val connection = remember(listState) {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                val current = animOffset.value
+                if (current != 0f) {
+                    val delta = available.y
+                    if ((current > 0 && delta < 0) || (current < 0 && delta > 0)) {
+                        val newOffset = if (current > 0) {
+                            (current + delta).coerceAtLeast(0f)
+                        } else {
+                            (current + delta).coerceAtMost(0f)
+                        }
+                        val consumedY = newOffset - current
+                        coroutineScope.launch { animOffset.snapTo(newOffset) }
+                        return Offset(0f, consumedY)
+                    }
+                }
+                return Offset.Zero
+            }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                if (available.y != 0f && source == NestedScrollSource.UserInput) {
+                    val current = animOffset.value
+                    val delta = available.y * 0.35f
+                    val newOffset = (current + delta).coerceIn(-140f, 140f)
+                    coroutineScope.launch { animOffset.snapTo(newOffset) }
+                    return Offset(0f, available.y)
+                }
+                return Offset.Zero
+            }
+
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                if (animOffset.value != 0f) {
+                    coroutineScope.launch {
+                        animOffset.animateTo(
+                            0f,
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        )
+                    }
+                }
+                return Velocity.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                val current = animOffset.value
+                if (current != 0f || available.y != 0f) {
+                    coroutineScope.launch {
+                        if (available.y != 0f && current == 0f) {
+                            val bounceTarget = (available.y * 0.04f).coerceIn(-80f, 80f)
+                            animOffset.animateTo(
+                                bounceTarget,
+                                spring(stiffness = Spring.StiffnessHigh)
+                            )
+                        }
+                        animOffset.animateTo(
+                            0f,
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        )
+                    }
+                }
+                return Velocity.Zero
+            }
+        }
+    }
+
+    return remember(listState, connection) {
+        BouncyOverscrollState(listState, animOffset, connection)
+    }
+}
+
+class BouncyOverscrollState(
+    val listState: LazyListState,
+    val animOffset: Animatable<Float, AnimationVector1D>,
+    val connection: NestedScrollConnection
+) {
+    val modifier: Modifier
+        @Composable get() {
+            return Modifier
+                .offset { IntOffset(0, animOffset.value.roundToInt()) }
+                .nestedScroll(connection)
+        }
 }

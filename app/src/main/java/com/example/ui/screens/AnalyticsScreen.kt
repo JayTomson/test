@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Language
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.example.data.BookStatus
 import com.example.data.fmtNum
 import com.example.ui.AppState
+import com.example.ui.components.rememberBouncyOverscrollState
 import com.example.ui.components.CardGroup
 import com.example.ui.components.CardGroupDivider
 import com.example.ui.components.SectionLabel
@@ -58,6 +61,7 @@ import com.example.ui.theme.RadiusSmall
 fun AnalyticsScreen(
     appState: AppState,
     onOpenSettings: () -> Unit,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val colors = LocalReadTrackerColors.current
@@ -74,15 +78,22 @@ fun AnalyticsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Назад",
+                    tint = colors.textFg
+                )
+            }
             Text(
                 text = "Аналитика",
                 style = TextStyle(
                     fontFamily = PlusJakartaSansFamily,
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 22.sp,
+                    fontSize = 20.sp,
                     letterSpacing = (-0.5).sp,
                     color = colors.textFg
                 ),
@@ -90,8 +101,11 @@ fun AnalyticsScreen(
             )
         }
 
+        val bouncyState = rememberBouncyOverscrollState()
+
         LazyColumn(
-            modifier = Modifier
+            state = bouncyState.listState,
+            modifier = bouncyState.modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
@@ -211,7 +225,7 @@ fun AnalyticsScreen(
                                                     fontFamily = PlusJakartaSansFamily,
                                                     fontWeight = FontWeight.Black,
                                                     fontSize = 15.sp,
-                                                    color = if (idx == 0) colors.accent else Color.Gray
+                                                    color = if (idx == 0) colors.accent else colors.textSecondary
                                                 ),
                                                 modifier = Modifier.width(24.dp)
                                             )
@@ -234,7 +248,7 @@ fun AnalyticsScreen(
                                                     fontFamily = PlusJakartaSansFamily,
                                                     fontWeight = FontWeight.Bold,
                                                     fontSize = 12.sp,
-                                                    color = Color.Gray
+                                                    color = colors.textSecondary
                                                 )
                                             )
                                         }
@@ -450,7 +464,7 @@ fun AnalyticsScreen(
                                 style = TextStyle(
                                     fontFamily = PlusJakartaSansFamily,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = colors.textSecondary
                                 )
                             )
                         }
@@ -458,7 +472,7 @@ fun AnalyticsScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                             contentDescription = null,
-                            tint = Color.Gray,
+                            tint = colors.textSecondary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -526,7 +540,7 @@ private fun MetricCardTile(
                     fontFamily = PlusJakartaSansFamily,
                     fontWeight = FontWeight.Medium,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colors.textSecondary
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

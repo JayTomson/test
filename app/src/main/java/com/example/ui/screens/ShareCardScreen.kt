@@ -138,7 +138,7 @@ fun ShareCardScreen(
                 Icon(
                     imageVector = Icons.Default.Download,
                     contentDescription = null,
-                    tint = Color.Black,
+                    tint = colors.accentOnColor,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -148,7 +148,7 @@ fun ShareCardScreen(
                         fontFamily = PlusJakartaSansFamily,
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 16.sp,
-                        color = Color.Black
+                        color = colors.accentOnColor
                     )
                 )
             }
@@ -265,7 +265,7 @@ private fun AnalyticsCardView(appState: AppState) {
                         fontFamily = PlusJakartaSansFamily,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             }
@@ -312,7 +312,7 @@ private fun MiniShareMetricTile(
                 style = TextStyle(
                     fontFamily = PlusJakartaSansFamily,
                     fontSize = 11.sp,
-                    color = Color.Gray
+                    color = colors.textSecondary
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -426,7 +426,7 @@ private fun LibraryCardView(appState: AppState) {
                                 fontFamily = PlusJakartaSansFamily,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = colors.textSecondary
                             )
                         )
                     }
@@ -447,7 +447,7 @@ private fun LibraryCardView(appState: AppState) {
                         fontFamily = PlusJakartaSansFamily,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             }

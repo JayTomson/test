@@ -7,6 +7,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -56,6 +58,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
+import com.example.ui.components.rememberBouncyOverscrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -180,19 +183,19 @@ fun LibraryScreen(
 
         ScrollableTabRow(
             selectedTabIndex = currentTabIndex,
-            edgePadding = if (settings.alignFilters) 6.dp else 16.dp,
+            edgePadding = if (settings.alignFilters) 8.dp else 16.dp,
             containerColor = colors.screenBg,
             indicator = { tabPositions ->
                 if (currentTabIndex in tabPositions.indices) {
                     SecondaryIndicator(
                         modifier = Modifier.tabIndicatorOffset(tabPositions[currentTabIndex]),
-                        height = 2.2.dp,
+                        height = 3.dp,
                         color = colors.accent
                     )
                 }
             },
             divider = {},
-            modifier = Modifier.height(34.dp)
+            modifier = Modifier.height(42.dp)
         ) {
             tabs.forEachIndexed { index, title ->
                 val isSelected = (currentTabIndex == index)
@@ -205,12 +208,14 @@ fun LibraryScreen(
                             style = TextStyle(
                                 fontFamily = PlusJakartaSansFamily,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                fontSize = 13.sp,
-                                color = if (isSelected) colors.accent else Color.Gray
-                            )
+                                fontSize = 14.sp,
+                                color = if (isSelected) colors.accent else colors.textSecondary
+                            ),
+                            maxLines = 1,
+                            softWrap = false
                         )
                     },
-                    modifier = Modifier.height(28.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 )
             }
         }
@@ -233,7 +238,7 @@ fun LibraryScreen(
                             style = TextStyle(
                                 fontFamily = PlusJakartaSansFamily,
                                 fontSize = 14.sp,
-                                color = Color.Gray
+                                color = colors.textSecondary
                             )
                         )
                     },
@@ -241,7 +246,7 @@ fun LibraryScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = null,
-                            tint = Color.Gray,
+                            tint = colors.textSecondary,
                             modifier = Modifier.size(20.dp)
                         )
                     },
@@ -254,7 +259,7 @@ fun LibraryScreen(
                                 Icon(
                                     imageVector = Icons.Default.Clear,
                                     contentDescription = null,
-                                    tint = Color.Gray,
+                                    tint = colors.textSecondary,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -287,7 +292,7 @@ fun LibraryScreen(
                     Icon(
                         imageVector = Icons.Default.FilterAlt,
                         contentDescription = null,
-                        tint = if (isFilterActive) colors.accent else Color.Gray,
+                        tint = if (isFilterActive) colors.accent else colors.textSecondary,
                         modifier = Modifier.size(19.dp)
                     )
                 }
@@ -388,39 +393,17 @@ fun LibraryScreen(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontSize = 13.sp,
-                            color = Color.Gray
+                            color = colors.textSecondary
                         )
                     )
                 }
             }
         } else {
-            val listState = rememberLazyListState()
-
-            // Bounce scroll effect
-            var overscrollOffset by remember { mutableStateOf(0f) }
-            val coroutineScope = rememberCoroutineScope()
+            val bouncyState = rememberBouncyOverscrollState()
 
             LazyColumn(
-                state = listState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .offset { IntOffset(0, overscrollOffset.roundToInt()) }
-                    .draggable(
-                        orientation = Orientation.Vertical,
-                        state = rememberDraggableState { delta ->
-                            val isAtTop = listState.firstVisibleItemIndex == 0 && listState.firstVisibleItemScrollOffset == 0
-                            if (isAtTop && delta > 0) {
-                                overscrollOffset = (overscrollOffset + delta * 0.4f).coerceAtMost(100f)
-                            } else if (overscrollOffset > 0) {
-                                overscrollOffset = (overscrollOffset + delta * 0.4f).coerceAtLeast(0f)
-                            }
-                        },
-                        onDragStopped = {
-                            coroutineScope.launch {
-                                overscrollOffset = 0f
-                            }
-                        }
-                    )
+                state = bouncyState.listState,
+                modifier = bouncyState.modifier.fillMaxSize()
             ) {
                 item { Spacer(modifier = Modifier.height(4.dp)) }
                 items(filteredBooks, key = { it.id }) { book ->
@@ -483,7 +466,7 @@ fun LibraryScreen(
                     style = TextStyle(
                         fontFamily = PlusJakartaSansFamily,
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = colors.textSecondary
                     )
                 )
             },
@@ -513,7 +496,7 @@ fun LibraryScreen(
                         style = TextStyle(
                             fontFamily = PlusJakartaSansFamily,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.Gray
+                            color = colors.textSecondary
                         )
                     )
                 }
@@ -603,6 +586,7 @@ private fun FormatFilterBottomSheet(
             }
 
             FlowRow(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -611,16 +595,19 @@ private fun FormatFilterBottomSheet(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
-                            .background(if (isSelected) colors.accent else Color.White.copy(alpha = 0.06f))
+                            .background(
+                                if (isSelected) colors.accent.copy(alpha = 0.20f)
+                                else colors.cardBg
+                            )
                             .border(
-                                width = 1.dp,
-                                color = if (isSelected) colors.accent else Color.White.copy(alpha = 0.10f),
+                                width = if (isSelected) 1.5.dp else 1.dp,
+                                color = if (isSelected) colors.accent else colors.dividerColor,
                                 shape = RoundedCornerShape(20.dp)
                             )
                             .clickable {
                                 localFilters = if (isSelected) localFilters - key else localFilters + key
                             }
-                            .padding(horizontal = 14.dp, vertical = 8.dp)
+                            .padding(horizontal = 14.dp, vertical = 7.dp)
                     ) {
                         Text(
                             text = label,
@@ -628,7 +615,7 @@ private fun FormatFilterBottomSheet(
                                 fontFamily = PlusJakartaSansFamily,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                                 fontSize = 13.sp,
-                                color = if (isSelected) Color.Black else Color.LightGray
+                                color = if (isSelected) colors.accent else colors.textSecondary
                             )
                         )
                     }
@@ -676,7 +663,7 @@ private fun FormatFilterBottomSheet(
                             fontFamily = PlusJakartaSansFamily,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 15.sp,
-                            color = Color.Black
+                            color = colors.accentOnColor
                         )
                     )
                 }
@@ -711,7 +698,7 @@ private fun ShareBottomSheet(
                     .width(36.dp)
                     .height(4.dp)
                     .clip(CircleShape)
-                    .background(Color.Gray.copy(alpha = 0.3f))
+                    .background(colors.textSecondary.copy(alpha = 0.3f))
                     .align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -800,7 +787,7 @@ private fun ShareOptionTile(
                 style = TextStyle(
                     fontFamily = PlusJakartaSansFamily,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = colors.textSecondary
                 )
             )
         }

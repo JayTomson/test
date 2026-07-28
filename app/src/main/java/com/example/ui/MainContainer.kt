@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -120,6 +122,7 @@ fun MainContainer(viewModel: AppStateViewModel) {
                     ) {
                         Row(
                             modifier = Modifier
+                                .navigationBarsPadding()
                                 .fillMaxWidth()
                                 .height(56.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -142,7 +145,7 @@ fun MainContainer(viewModel: AppStateViewModel) {
                                     Icon(
                                         imageVector = Icons.Default.MenuBook,
                                         contentDescription = null,
-                                        tint = if (isLibrarySelected) colors.accent else Color.Gray,
+                                        tint = if (isLibrarySelected) colors.accent else colors.textSecondary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
@@ -152,7 +155,7 @@ fun MainContainer(viewModel: AppStateViewModel) {
                                             fontFamily = PlusJakartaSansFamily,
                                             fontWeight = if (isLibrarySelected) FontWeight.Bold else FontWeight.Medium,
                                             fontSize = 13.sp,
-                                            color = if (isLibrarySelected) colors.accent else Color.Gray
+                                            color = if (isLibrarySelected) colors.accent else colors.textSecondary
                                         )
                                     )
                                 }
@@ -176,7 +179,7 @@ fun MainContainer(viewModel: AppStateViewModel) {
                                     Icon(
                                         imageVector = Icons.Default.BarChart,
                                         contentDescription = null,
-                                        tint = if (isAnalyticsSelected) colors.accent else Color.Gray,
+                                        tint = if (isAnalyticsSelected) colors.accent else colors.textSecondary,
                                         modifier = Modifier.size(20.dp)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
@@ -186,7 +189,7 @@ fun MainContainer(viewModel: AppStateViewModel) {
                                             fontFamily = PlusJakartaSansFamily,
                                             fontWeight = if (isAnalyticsSelected) FontWeight.Bold else FontWeight.Medium,
                                             fontSize = 13.sp,
-                                            color = if (isAnalyticsSelected) colors.accent else Color.Gray
+                                            color = if (isAnalyticsSelected) colors.accent else colors.textSecondary
                                         )
                                     )
                                 }
@@ -203,8 +206,8 @@ fun MainContainer(viewModel: AppStateViewModel) {
                             currentRoute = ScreenRoute.ADD_EDIT
                         },
                         containerColor = colors.accent,
-                        contentColor = Color.Black,
-                        shape = CircleShape,
+                        contentColor = colors.accentOnColor,
+                        shape = RoundedCornerShape(16.dp),
                         elevation = if (settings.fabGlow) {
                             FloatingActionButtonDefaults.elevation(defaultElevation = 12.dp, pressedElevation = 16.dp)
                         } else {
@@ -216,7 +219,7 @@ fun MainContainer(viewModel: AppStateViewModel) {
                                 if (settings.fabGlow) {
                                     Modifier.shadow(
                                         elevation = 16.dp,
-                                        shape = CircleShape,
+                                        shape = RoundedCornerShape(16.dp),
                                         ambientColor = colors.accent.copy(alpha = 0.5f),
                                         spotColor = colors.accent.copy(alpha = 0.6f)
                                     )
@@ -258,7 +261,8 @@ fun MainContainer(viewModel: AppStateViewModel) {
                         )
                         ScreenRoute.ANALYTICS -> AnalyticsScreen(
                             appState = appState,
-                            onOpenSettings = { currentRoute = ScreenRoute.SETTINGS }
+                            onOpenSettings = { currentRoute = ScreenRoute.SETTINGS },
+                            onBack = { currentRoute = ScreenRoute.LIBRARY }
                         )
                         ScreenRoute.ADD_EDIT -> AddEditBookScreen(
                             initialBook = bookToEdit,
@@ -313,7 +317,8 @@ fun MainContainer(viewModel: AppStateViewModel) {
                             )
                             ScreenRoute.ANALYTICS -> AnalyticsScreen(
                                 appState = appState,
-                                onOpenSettings = { currentRoute = ScreenRoute.SETTINGS }
+                                onOpenSettings = { currentRoute = ScreenRoute.SETTINGS },
+                                onBack = { currentRoute = ScreenRoute.LIBRARY }
                             )
                             ScreenRoute.ADD_EDIT -> AddEditBookScreen(
                                 initialBook = bookToEdit,
